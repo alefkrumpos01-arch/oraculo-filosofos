@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Oráculo dos Filósofos | Diagnóstico de Alinhamento</title>
+    
+    <!-- FAVICON -->
+    <link rel="icon" href="./favicon.png">
+
+    <!-- VERCEL ANALYTICS SCRIPT -->
+    <script defer src="/_vercel/insights/script.js"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#090a0f',
+                        charcoal: '#12141d',
+                        crimson: {
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                            950: '#450a0a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #090a0f;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .glass-panel {
+            background: rgba(18, 20, 29, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-crimson-900 selection:text-white">
+
+    <!-- Header -->
+    <header class="w-full border-b border-white/10 glass-panel py-4 px-6 flex justify-between items-center z-10 sticky top-0">
+        <h1 class="text-lg md:text-xl font-bold tracking-widest uppercase text-gray-200">
+            O Oráculo dos <span class="text-red-600">Filósofos</span>
+        </h1>
+        <button id="btn-lang" class="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-xs font-bold uppercase tracking-wider text-white transition cursor-pointer">
+            EN
+        </button>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow flex items-center justify-center p-4 md:p-8">
+        <div class="w-full max-w-3xl">
+
+            <!-- INTRO SCREEN -->
+            <div id="screen-intro" class="glass-panel rounded-2xl p-6 md:p-10 text-center shadow-2xl space-y-6">
+                <div class="inline-block p-3 rounded-full bg-red-950/40 border border-red-900/50 mb-2">
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <h2 id="txt-title" class="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+                    Mapeamento de Matriz Intelectual
+                </h2>
+                <p id="txt-desc" class="text-gray-400 max-w-xl mx-auto text-base md:text-lg leading-relaxed">
+                    Responda a 25 dilemas axiomáticos. O algoritmo mapeará sua visão de mundo e revelará seus 4 arquétipos: seu Aliado, seu Rival, o Sético e seu Inimigo Mortal.
+                </p>
+                <button id="btn-start" class="w-full md:w-auto px-10 py-4 bg-red-700 hover:bg-red-600 text-white font-semibold uppercase tracking-wider rounded-xl transition duration-200 shadow-lg shadow-red-950/50 cursor-pointer">
+                    Iniciar Diagnóstico (25 Perguntas)
+                </button>
+            </div>
+
+            <!-- QUIZ SCREEN -->
+            <div id="screen-quiz" class="glass-panel rounded-2xl p-6 md:p-10 shadow-2xl hidden space-y-8">
+                <!-- Progress Header -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-sm font-semibold text-gray-400">
+                        <span id="question-number">Pergunta 1 de 25</span>
+                        <span id="progress-percent" class="text-red-500">4%</span>
+                    </div>
+                    <div class="w-full bg-gray-900 rounded-full h-2 overflow-hidden border border-white/5">
+                        <div id="progress-bar" class="bg-red-600 h-2 rounded-full transition-all duration-300" style="width: 4%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Text -->
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-gray-100 min-h-[4rem] flex items-center">
+                    Carregando pergunta...
+                </h3>
+
+                <!-- Options -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Dynamic Options -->
+                </div>
+            </div>
+
+            <!-- RESULT SCREEN -->
+            <div id="screen-result" class="glass-panel rounded-2xl p-6 md:p-10 shadow-2xl hidden space-y-8">
+                <div class="text-center space-y-2">
+                    <span id="lbl-result-header" class="text-xs font-semibold uppercase tracking-widest text-red-500">Diagnóstico Concluído</span>
+                    <h2 id="lbl-result-title" class="text-3xl font-extrabold text-white">Seu Arquétipo Filosófico</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Amigo -->
+                    <div class="glass-card p-5 rounded-xl border-l-4 border-emerald-500 space-y-2">
+                        <div id="lbl-ally" class="text-xs uppercase tracking-wider text-emerald-400 font-bold">Seu Amigo / Aliado</div>
+                        <div id="res-ally-name" class="text-xl font-bold text-white">---</div>
+                        <div id="res-ally-desc" class="text-sm text-gray-400">---</div>
+                    </div>
+
+                    <!-- Rival -->
+                    <div class="glass-card p-5 rounded-xl border-l-4 border-amber-500 space-y-2">
+                        <div id="lbl-rival" class="text-xs uppercase tracking-wider text-amber-400 font-bold">Seu Rival Intelectual</div>
+                        <div id="res-rival-name" class="text-xl font-bold text-white">---</div>
+                        <div id="res-rival-desc" class="text-sm text-gray-400">---</div>
+                    </div>
+
+                    <!-- Mentiroso -->
+                    <div class="glass-card p-5 rounded-xl border-l-4 border-purple-500 space-y-2">
+                        <div id="lbl-accuser" class="text-xs uppercase tracking-wider text-purple-400 font-bold">Te Chamaria de Mentiroso</div>
+                        <div id="res-accuser-name" class="text-xl font-bold text-white">---</div>
+                        <div id="res-accuser-desc" class="text-sm text-gray-400">---</div>
+                    </div>
+
+                    <!-- Inimigo -->
+                    <div class="glass-card p-5 rounded-xl border-l-4 border-red-600 space-y-2">
+                        <div id="lbl-enemy" class="text-xs uppercase tracking-wider text-red-500 font-bold">Inimigo Mortal</div>
+                        <div id="res-enemy-name" class="text-xl font-bold text-white">---</div>
+                        <div id="res-enemy-desc" class="text-sm text-gray-400">---</div>
+                    </div>
+                </div>
+
+                <!-- Summary Quote -->
+                <div class="bg-black/40 border border-white/10 p-4 rounded-xl text-center italic text-gray-300 text-sm" id="res-quote">
+                    "---"
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button id="btn-copy" class="flex-1 py-3 px-4 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl text-sm transition cursor-pointer">
+                        Copiar Resultado
+                    </button>
+                    <button id="btn-reset" class="flex-1 py-3 px-4 bg-red-800 hover:bg-red-700 text-white font-medium rounded-xl text-sm transition cursor-pointer">
+                        Refazer Teste
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="w-full border-t border-white/5 py-4 text-center text-xs text-gray-600">
+        O Oráculo dos Filósofos © 2026 — Processamento Local Sem Coleta de Dados
+    </footer>
+
+    <script>
+        let currentLang = 'pt';
+
+        const uiText = {
+            pt: {
+                title: "Mapeamento de Matriz Intelectual",
+                desc: "Responda a 25 dilemas axiomáticos. O algoritmo mapeará sua visão de mundo e revelará seus 4 arquétipos: seu Aliado, seu Rival, o Sético e seu Inimigo Mortal.",
+                startBtn: "Iniciar Diagnóstico (25 Perguntas)",
+                qPrefix: "Pergunta",
+                qOf: "de",
+                resHeader: "Diagnóstico Concluído",
+                resTitle: "Seu Arquétipo Filosófico",
+                ally: "Seu Amigo / Aliado",
+                rival: "Seu Rival Intelectual",
+                accuser: "Te Chamaria de Mentiroso",
+                enemy: "Inimigo Mortal",
+                copyBtn: "Copiar Resultado",
+                resetBtn: "Refazer Teste",
+                rivalDescSuffix: "Um intelecto de mesmo porte que discordaria do seu método primário.",
+                accuserDescSuffix: "Apontaria suas contradições e diria que você racionaliza sua própria postura.",
+                enemyDescSuffix: "O oposto polar do seu axioma. Suas visões de mundo repelem-se mutuamente.",
+                copiedAlert: "Resultado copiado para a área de transferência!"
+            },
+            en: {
+                title: "Intellectual Matrix Mapping",
+                desc: "Answer 25 axiomatic dilemmas. The algorithm will map your worldview and reveal your 4 archetypes: your Ally, your Rival, the Accuser, and your Mortal Enemy.",
+                startBtn: "Start Diagnostic (25 Questions)",
+                qPrefix: "Question",
+                qOf: "of",
+                resHeader: "Diagnostic Completed",
+                resTitle: "Your Philosophical Archetype",
+                ally: "Your Friend / Ally",
+                rival: "Your Intellectual Rival",
+                accuser: "Would Call You a Liar",
+                enemy: "Mortal Enemy",
+                copyBtn: "Copy Result",
+                resetBtn: "Retake Test",
+                rivalDescSuffix: "An intellect of equal caliber who would challenge your primary method.",
+                accuserDescSuffix: "Would expose your internal contradictions and accuse you of rationalizing.",
+                enemyDescSuffix: "The polar opposite of your axioms. Your worldviews mutually repel.",
+                copiedAlert: "Result copied to clipboard!"
+            }
+        };
+
+        const questionsData = [
+            {
+                pt: { q: "Qual é a natureza primordial da Verdade?", options: [
+                    { text: "A verdade é objetiva, eterna e acessível puramente pela razão.", scores: { rationalist: 3, idealist: 2 } },
+                    { text: "A verdade é aquilo que funciona e produz resultados práticos no mundo físico.", scores: { pragmatist: 3, empiricist: 2 } },
+                    { text: "A verdade é uma ilusão social construída por relações de poder.", scores: { cynic: 3, existentialist: 2 } },
+                    { text: "A verdade é individual; cada um constrói seu próprio sentido frente ao caos.", scores: { existentialist: 3, stoic: 1 } }
+                ]},
+                en: { q: "What is the primordial nature of Truth?", options: [
+                    { text: "Truth is objective, eternal, and accessible purely through reason.", scores: { rationalist: 3, idealist: 2 } },
+                    { text: "Truth is whatever works and yields practical results in the physical world.", scores: { pragmatist: 3, empiricist: 2 } },
+                    { text: "Truth is a social illusion constructed by power dynamics.", scores: { cynic: 3, existentialist: 2 } },
+                    { text: "Truth is individual; each person constructs their own meaning facing chaos.", scores: { existentialist: 3, stoic: 1 } }
+                ]}
+            },
+            {
+                pt: { q: "O que define a Justiça?", options: [
+                    { text: "A aplicação rigorosa de leis morais universais e inegociáveis.", scores: { idealist: 3, rationalist: 1 } },
+                    { text: "A minimização da fricção social e maximização da eficiência coletiva.", scores: { pragmatist: 3, stoic: 2 } },
+                    { text: "Uma convenção criada pelos fortes para controlar os fracos.", scores: { cynic: 3 } },
+                    { text: "A aceitação serena dos fatos e a responsabilidade com a própria virtude.", scores: { stoic: 3 } }
+                ]},
+                en: { q: "What defines Justice?", options: [
+                    { text: "The rigorous application of universal and non-negotiable moral laws.", scores: { idealist: 3, rationalist: 1 } },
+                    { text: "Minimizing social friction and maximizing collective efficiency.", scores: { pragmatist: 3, stoic: 2 } },
+                    { text: "A convention created by the strong to control the weak.", scores: { cynic: 3 } },
+                    { text: "The serene acceptance of facts and responsibility for one's virtue.", scores: { stoic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Como lidar com a entropia e o sofrimento da existência?", options: [
+                    { text: "Servindo como um 'dique' — impondo ordem, estrutura e trabalho contra o caos.", scores: { pragmatist: 3, stoic: 2 } },
+                    { text: "Entendendo que o sofrimento é apenas um erro de interpretação mental.", scores: { stoic: 3, rationalist: 1 } },
+                    { text: "Abraçando a dor como o motor da criação de si mesmo.", scores: { existentialist: 3 } },
+                    { text: "Rindo do absurdo e desmascarando a vaidade dos que tentam controlar o universo.", scores: { cynic: 3 } }
+                ]},
+                en: { q: "How to deal with entropy and the suffering of existence?", options: [
+                    { text: "Serving as a dam — imposing order, structure, and labor against chaos.", scores: { pragmatist: 3, stoic: 2 } },
+                    { text: "Understanding that suffering is merely a mental misinterpretation.", scores: { stoic: 3, rationalist: 1 } },
+                    { text: "Embracing pain as the catalyst for self-creation.", scores: { existentialist: 3 } },
+                    { text: "Laughing at the absurd and unmasking the vanity of those attempting to control reality.", scores: { cynic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "O que é o ser humano?", options: [
+                    { text: "Um animal biológico que opera por impulsos de poder e sobrevivência.", scores: { cynic: 3, empiricist: 2 } },
+                    { text: "Uma mente consciente cuja missão é descobrir a ordem lógica do cosmos.", scores: { rationalist: 3, idealist: 2 } },
+                    { text: "Um projeto em aberto; nada somos além das nossas escolhas diárias.", scores: { existentialist: 3 } },
+                    { text: "Um nó temporário de matéria e energia tentando manter estabilidade.", scores: { stoic: 2, pragmatist: 3 } }
+                ]},
+                en: { q: "What is a human being?", options: [
+                    { text: "A biological animal driven by impulses of power and survival.", scores: { cynic: 3, empiricist: 2 } },
+                    { text: "A conscious mind whose quest is uncovering the logical order of the cosmos.", scores: { rationalist: 3, idealist: 2 } },
+                    { text: "An open-ended project; we are nothing beyond our daily choices.", scores: { existentialist: 3 } },
+                    { text: "A temporary node of matter and energy attempting to maintain stability.", scores: { stoic: 2, pragmatist: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual o valor da Tradição e da Instituição?", options: [
+                    { text: "Inestimável; são as estruturas acumuladas que impedem o colapso da civilização.", scores: { idealist: 2, pragmatist: 2 } },
+                    { text: "Útil enquanto funcionar; se virar burocracia ineficiente, deve ser descartada.", scores: { pragmatist: 3 } },
+                    { text: "Irrelevante; estruturas sociais engessam a liberdade autêntica.", scores: { existentialist: 2, cynic: 2 } },
+                    { text: "Suspeita; quase todas as instituições servem para disfarçar a hipocrisia humana.", scores: { cynic: 3 } }
+                ]},
+                en: { q: "What is the value of Tradition and Institutions?", options: [
+                    { text: "Invaluable; they are accumulated structures preventing civilization's collapse.", scores: { idealist: 2, pragmatist: 2 } },
+                    { text: "Useful while functional; if turned into inefficient bureaucracy, discard them.", scores: { pragmatist: 3 } },
+                    { text: "Irrelevant; social institutions paralyze authentic human freedom.", scores: { existentialist: 2, cynic: 2 } },
+                    { text: "Suspicious; almost all institutions disguise human hypocrisy.", scores: { cynic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Como você enxerga a Moralidade?", options: [
+                    { text: "Engenharia de eficiência social para evitar atrito e destruição desnecessária.", scores: { pragmatist: 3, empiricist: 1 } },
+                    { text: "Um dever absoluto derivado de axiomas lógicos incontestáveis.", scores: { rationalist: 3, idealist: 2 } },
+                    { text: "Uma muleta emocional inventada para consolar os fracos.", scores: { cynic: 3 } },
+                    { text: "A firmeza interna de não ser corrompido pelas circunstâncias externas.", scores: { stoic: 3 } }
+                ]},
+                en: { q: "How do you view Morality?", options: [
+                    { text: "Social efficiency engineering to prevent friction and destruction.", scores: { pragmatist: 3, empiricist: 1 } },
+                    { text: "An absolute duty derived from unquestionable logical axioms.", scores: { rationalist: 3, idealist: 2 } },
+                    { text: "An emotional crutch invented to comfort the weak.", scores: { cynic: 3 } },
+                    { text: "Internal resilience against corruption from external circumstances.", scores: { stoic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "O universo tem uma intenção ou propósito prévio?", options: [
+                    { text: "Sim, existe uma arquitetura e um plano inteligível por trás de tudo.", scores: { rationalist: 3, idealist: 3 } },
+                    { text: "Não, o universo é um sistema físico indiferente que obedece à termodinâmica.", scores: { empiricist: 3, pragmatist: 2 } },
+                    { text: "É indiferente; cabe ao indivíduo forjar o próprio propósito na marra.", scores: { existentialist: 3 } },
+                    { text: "Não, e quem afirma o contrário está tentando vender alguma ilusão.", scores: { cynic: 3 } }
+                ]},
+                en: { q: "Does the universe have an intention or prior purpose?", options: [
+                    { text: "Yes, there is an intelligible architecture behind all things.", scores: { rationalist: 3, idealist: 3 } },
+                    { text: "No, the universe is an indifferent physical system governed by laws.", scores: { empiricist: 3, pragmatist: 2 } },
+                    { text: "It is indifferent; individuals must forge their own purpose through will.", scores: { existentialist: 3 } },
+                    { text: "No, and anyone claiming otherwise is selling an illusion.", scores: { cynic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual deve ser a relação com o Poder politicamente instituído?", options: [
+                    { text: "Obediência racional quando ele garante a ordem e a segurança dos indivíduos.", scores: { rationalist: 2, stoic: 2 } },
+                    { text: "Desconfiança constante e crítica ácida a qualquer dogmatismo moral.", scores: { cynic: 3 } },
+                    { text: "Construção de autonomia pessoal à margem dos jogos de engrenagem do Estado.", scores: { stoic: 3, existentialist: 2 } },
+                    { text: "Disputa pragmática para utilizar o poder como ferramenta de transformação real.", scores: { pragmatist: 3 } }
+                ]},
+                en: { q: "What should be the relationship with political Power?", options: [
+                    { text: "Rational obedience when it guarantees individual order and security.", scores: { rationalist: 2, stoic: 2 } },
+                    { text: "Constant distrust and sharp critique of any moral dogmatism.", scores: { cynic: 3 } },
+                    { text: "Building personal autonomy outside state machinery.", scores: { stoic: 3, existentialist: 2 } },
+                    { text: "Pragmatic engagement to use power as a tool for real transformation.", scores: { pragmatist: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Como você encara a morte física?", options: [
+                    { text: "Um evento biológico natural: os átomos retornam ao estado de menor energia.", scores: { empiricist: 3, stoic: 2 } },
+                    { text: "O limite que dá urgência, peso e valor real às nossas escolhas presentes.", scores: { existentialist: 3 } },
+                    { text: "Apenas a transição do corpo; a essência racional ou o impacto da obra permanecem.", scores: { rationalist: 2, idealist: 3 } },
+                    { text: "A grande equalizadora que zera o ego de reis e mendigos na mesma terra.", scores: { cynic: 3 } }
+                ]},
+                en: { q: "How do you view physical death?", options: [
+                    { text: "A natural biological event: atoms return to a lower energy state.", scores: { empiricist: 3, stoic: 2 } },
+                    { text: "The boundary that gives urgency, weight, and value to present choices.", scores: { existentialist: 3 } },
+                    { text: "Only a body transition; rational essence or legacy remains.", scores: { rationalist: 2, idealist: 3 } },
+                    { text: "The great equalizer wiping out the ego of kings and beggars alike.", scores: { cynic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual a melhor estratégia diante da estupidez coletiva?", options: [
+                    { text: "Educação sistemática através do questionamento e do método rigoroso.", scores: { rationalist: 3 } },
+                    { text: "O sarcasmo e a provocação pública para desmascarar a ignorância.", scores: { cynic: 3 } },
+                    { text: "Ignorar o ruído externo e focar no domínio sobre as próprias reações.", scores: { stoic: 3 } },
+                    { text: "Construir sistemas e ferramentas que funcionem a despeito da estupidez alheia.", scores: { pragmatist: 3 } }
+                ]},
+                en: { q: "What is the best strategy against collective ignorance?", options: [
+                    { text: "Systematic education through questioning and rigorous method.", scores: { rationalist: 3 } },
+                    { text: "Sarcasm and public provocation to unmask foolishness.", scores: { cynic: 3 } },
+                    { text: "Ignoring external noise and focusing on mastery over reactions.", scores: { stoic: 3 } },
+                    { text: "Building systems that operate effectively despite external stupidity.", scores: { pragmatist: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "A Ciência é o único caminho para o conhecimento legítimo?", options: [
+                    { text: "Sim; só o método empírico e testável entrega dados confiáveis da matéria.", scores: { empiricist: 3 } },
+                    { text: "Não; a razão pura e os axiomas lógicos antecedem e fundamentam a ciência.", scores: { rationalist: 3 } },
+                    { text: "A ciência é uma ferramenta poderosa, mas a vivência subjetiva tem primazia.", scores: { existentialist: 3 } },
+                    { text: "A ciência é ótima, mas frequentemente é instrumentalizada por interesses de poder.", scores: { cynic: 2, pragmatist: 2 } }
+                ]},
+                en: { q: "Is Science the sole path to legitimate knowledge?", options: [
+                    { text: "Yes; only empirical and testable methods provide reliable physical data.", scores: { empiricist: 3 } },
+                    { text: "No; pure reason and logical axioms precede and ground science.", scores: { rationalist: 3 } },
+                    { text: "Science is powerful, but subjective experience holds primacy.", scores: { existentialist: 3 } },
+                    { text: "Science is useful, but often instrumentalized by power interests.", scores: { cynic: 2, pragmatist: 2 } }
+                ]}
+            },
+            {
+                pt: { q: "O que é o Livre-Arbítrio?", options: [
+                    { text: "Uma ilusão física; somos determinados por causas, química e histórico prévio.", scores: { empiricist: 3, rationalist: 1 } },
+                    { text: "A capacidade radical e dolorosa de escolher a própria conduta a cada segundo.", scores: { existentialist: 3 } },
+                    { text: "A liberdade de governar a própria mente, independente do determinismo externo.", scores: { stoic: 3 } },
+                    { text: "Um conceito secundário; o que importa é a margem real de manobra que você tem hoje.", scores: { pragmatist: 3 } }
+                ]},
+                en: { q: "What is Free Will?", options: [
+                    { text: "A physical illusion; we are determined by cause, chemistry, and history.", scores: { empiricist: 3, rationalist: 1 } },
+                    { text: "The radical and painful ability to choose conduct at every moment.", scores: { existentialist: 3 } },
+                    { text: "The freedom to govern one's mind regardless of external determinism.", scores: { stoic: 3 } },
+                    { text: "A secondary concept; real operational leverage today is what matters.", scores: { pragmatist: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual o papel da Arte na existência humana?", options: [
+                    { text: "Expressar ideias eternas, a beleza suprema e a ordem do abstrato.", scores: { idealist: 3 } },
+                    { text: "Gritar contra a finitude e criar sentido em um mundo mudo.", scores: { existentialist: 3 } },
+                    { text: "Expor as vísceras da contradição humana sem pudor ou verniz social.", scores: { cynic: 3 } },
+                    { text: "Forma de refinamento da percepção e catalisador de energia vital.", scores: { stoic: 1, pragmatist: 2 } }
+                ]},
+                en: { q: "What is the role of Art in human existence?", options: [
+                    { text: "Expressing eternal ideas, supreme beauty, and abstract order.", scores: { idealist: 3 } },
+                    { text: "Screaming against finitude and projecting meaning onto a silent world.", scores: { existentialist: 3 } },
+                    { text: "Exposing human contradictions without social varnish.", scores: { cynic: 3 } },
+                    { text: "Refining perception and serving as a vital energy catalyst.", scores: { stoic: 1, pragmatist: 2 } }
+                ]}
+            },
+            {
+                pt: { q: "A utopia política de uma sociedade perfeita é possível?", options: [
+                    { text: "Sim, se for desenhada com base em princípios lógicos universais e perfeitos.", scores: { idealist: 3, rationalist: 2 } },
+                    { text: "Não; a natureza humana é falha e qualquer utopia termina em tirania ou caos.", scores: { cynic: 3, stoic: 2 } },
+                    { text: "Perfeição não existe, mas otimizações incrementais de sistemas são viáveis.", scores: { pragmatist: 3 } },
+                    { text: "Não importa o sistema; a única verdadeira libertação é individual.", scores: { existentialist: 2, stoic: 2 } }
+                ]},
+                en: { q: "Is a political utopia of a perfect society possible?", options: [
+                    { text: "Yes, if designed based on universal and flawless logical principles.", scores: { idealist: 3, rationalist: 2 } },
+                    { text: "No; human nature is flawed and utopias decay into tyranny or chaos.", scores: { cynic: 3, stoic: 2 } },
+                    { text: "Perfection is impossible, but incremental system updates are viable.", scores: { pragmatist: 3 } },
+                    { text: "Systems don't matter; true liberation is strictly individual.", scores: { existentialist: 2, stoic: 2 } }
+                ]}
+            },
+            {
+                pt: { q: "Como você reage a uma traição ou quebra de confiança?", options: [
+                    { text: "Analiso os fatos friamente; o erro era uma probabilidade que eu devia ter previsto.", scores: { stoic: 3, rationalist: 1 } },
+                    { text: "Corto o vínculo imediatamente e recalibro o sistema para nunca mais depender da pessoa.", scores: { pragmatist: 3 } },
+                    { text: "Não me surpreendo: o egoísmo é a força motriz básica da maioria dos homens.", scores: { cynic: 3 } },
+                    { text: "Reafirmo meus princípios absolutos de conduta, sem me rebaixar ao ato do outro.", scores: { idealist: 2, stoic: 2 } }
+                ]},
+                en: { q: "How do you react to betrayal or broken trust?", options: [
+                    { text: "Analyze facts coldly; failure was a probability I should have calculated.", scores: { stoic: 3, rationalist: 1 } },
+                    { text: "Cut ties immediately and recalibrate systems to eliminate dependency.", scores: { pragmatist: 3 } },
+                    { text: "Unsurprised; self-interest is the primary driver of most humans.", scores: { cynic: 3 } },
+                    { text: "Reaffirm absolute internal principles without stooping to their level.", scores: { idealist: 2, stoic: 2 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual é a origem do Mal?", options: [
+                    { text: "A ignorância e a falta de capacidade de raciocinar com clareza.", scores: { rationalist: 3, idealist: 1 } },
+                    { text: "A ineficiência estrutural e a escassez de recursos de um ambiente desorganizado.", scores: { pragmatist: 3 } },
+                    { text: "A covardia de não assumir a responsabilidade por sua própria liberdade.", scores: { existentialist: 3 } },
+                    { text: "O 'mal' é uma etiqueta moralista inventada; existem apenas interesses em choque.", scores: { cynic: 3, empiricist: 1 } }
+                ]},
+                en: { q: "What is the origin of Evil?", options: [
+                    { text: "Ignorance and the inability to reason with clarity.", scores: { rationalist: 3, idealist: 1 } },
+                    { text: "Structural inefficiency and resource scarcity in unorganized systems.", scores: { pragmatist: 3 } },
+                    { text: "Cowardice in failing to take responsibility for radical freedom.", scores: { existentialist: 3 } },
+                    { text: "'Evil' is a moralistic label; only conflicting interests exist.", scores: { cynic: 3, empiricist: 1 } }
+                ]}
+            },
+            {
+                pt: { q: "O trabalho humano deve ser focado em quê?", options: [
+                    { text: "Em dominar a matéria e criar ferramentas que solucionem problemas reais.", scores: { pragmatist: 3, empiricist: 2 } },
+                    { text: "Em cultivar a virtude interna, a serenidade e a autonomia intelectual.", scores: { stoic: 3 } },
+                    { text: "Em expressar a singularidade da própria identidade contra a massa.", scores: { existentialist: 3 } },
+                    { text: "Em desconstruir os dogmas e as ilusões que acorrentam o pensamento.", scores: { cynic: 3, rationalist: 1 } }
+                ]},
+                en: { q: "What should human effort be focused on?", options: [
+                    { text: "Mastering matter and building tools that solve practical problems.", scores: { pragmatist: 3, empiricist: 2 } },
+                    { text: "Cultivating internal virtue, tranquility, and intellectual autonomy.", scores: { stoic: 3 } },
+                    { text: "Expressing unique personal identity against the crowd.", scores: { existentialist: 3 } },
+                    { text: "Deconstructing dogmas and illusions chaining human thought.", scores: { cynic: 3, rationalist: 1 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual sua postura em relação aos bens materiais e à riqueza?", options: [
+                    { text: "São recursos neutros; úteis como alavanca e segurança, desprezíveis se virarem culto.", scores: { stoic: 3, pragmatist: 2 } },
+                    { text: "São métricas tangíveis de eficácia e domínio sobre o meio físico.", scores: { empiricist: 2, pragmatist: 3 } },
+                    { text: "O excesso é uma gaiola dourada que escraviza a mente e fomenta a vaidade.", scores: { cynic: 3 } },
+                    { text: "São secundários frente ao desenvolvimento do espírito e da inteligência.", scores: { idealist: 3, rationalist: 1 } }
+                ]},
+                en: { q: "What is your stance on material wealth?", options: [
+                    { text: "Neutral tools; useful for leverage, despicable if worshipped.", scores: { stoic: 3, pragmatist: 2 } },
+                    { text: "Tangible metrics of real-world efficiency and environmental control.", scores: { empiricist: 2, pragmatist: 3 } },
+                    { text: "Excess is a golden cage enslaving the mind and fueling vanity.", scores: { cynic: 3 } },
+                    { text: "Secondary compared to intellectual and spiritual development.", scores: { idealist: 3, rationalist: 1 } }
+                ]}
+            },
+            {
+                pt: { q: "A linguagem humana consegue descrever a realidade com precisão?", options: [
+                    { text: "Sim, através do rigor da matemática, da lógica e do método estruturado.", scores: { rationalist: 3 } },
+                    { text: "Ela descreve apenas modelos empíricos úteis, nunca a coisa-em-si absoluta.", scores: { empiricist: 3, pragmatist: 2 } },
+                    { text: "A linguagem é uma teia limitada que frequentemente cria armadilhas mentais.", scores: { cynic: 2, existentialist: 2 } },
+                    { text: "A linguagem é a principal ferramenta humana para impor ordem ao caos.", scores: { pragmatist: 3 } }
+                ]},
+                en: { q: "Can human language accurately describe reality?", options: [
+                    { text: "Yes, through mathematics, formal logic, and structured method.", scores: { rationalist: 3 } },
+                    { text: "It describes useful empirical models, never absolute underlying reality.", scores: { empiricist: 3, pragmatist: 2 } },
+                    { text: "Language is a limited web frequently setting mental traps.", scores: { cynic: 2, existentialist: 2 } },
+                    { text: "Language is our primary engine for imposing order upon chaos.", scores: { pragmatist: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual o peso do Destino versus a Ação Individual?", options: [
+                    { text: "As circunstâncias externas são dadas; sua reação a elas é 100% de sua conta.", scores: { stoic: 3 } },
+                    { text: "Não há destino; há leis físicas encadeadas e a margem de manobra do operador.", scores: { pragmatist: 3, empiricist: 1 } },
+                    { text: "Você é inteiramente responsável por inventar a si mesmo a cada decisão.", scores: { existentialist: 3 } },
+                    { text: "O 'destino' é a desculpa dos medíocres para justificar a própria inércia.", scores: { cynic: 3 } }
+                ]},
+                en: { q: "What is the balance between Fate and Individual Action?", options: [
+                    { text: "External circumstances are given; your response is entirely your responsibility.", scores: { stoic: 3 } },
+                    { text: "No fate exists; only physical causality and operator leverage.", scores: { pragmatist: 3, empiricist: 1 } },
+                    { text: "You are entirely responsible for creating yourself with every choice.", scores: { existentialist: 3 } },
+                    { text: "'Fate' is a comforting excuse for mediocre inertia.", scores: { cynic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "O avanço tecnológico garante o progresso humano?", options: [
+                    { text: "Garante eficiência técnica, mas a virtude moral do homem permanece inalterada.", scores: { stoic: 3, cynic: 2 } },
+                    { text: "Sim, a tecnologia é a ampliação direta da nossa capacidade de ordenar a matéria.", scores: { pragmatist: 3, rationalist: 1 } },
+                    { text: "Apenas aumenta a escala da nossa capacidade autodestrutiva e alienante.", scores: { existentialist: 2, cynic: 2 } },
+                    { text: "Traz dados melhores, mas sem sabedoria é apenas ferramenta cega.", scores: { empiricist: 2, rationalist: 2 } }
+                ]},
+                en: { q: "Does technological advancement guarantee human progress?", options: [
+                    { text: "Guarantees technical efficiency, but moral virtue remains unchanged.", scores: { stoic: 3, cynic: 2 } },
+                    { text: "Yes, technology directly expands our capacity to structure matter.", scores: { pragmatist: 3, rationalist: 1 } },
+                    { text: "It only scales our self-destructive and alienating capacities.", scores: { existentialist: 2, cynic: 2 } },
+                    { text: "Provides superior data, but without wisdom it remains a blind tool.", scores: { empiricist: 2, rationalist: 2 } }
+                ]}
+            },
+            {
+                pt: { q: "O que deve orientar uma tomada de decisão crítica?", options: [
+                    { text: "O cálculo lógico dos fatos frios e das variáveis mensuráveis.", scores: { rationalist: 3, empiricist: 2 } },
+                    { text: "A maximização da utilidade prática e o menor impacto deletério no sistema.", scores: { pragmatist: 3 } },
+                    { text: "A fidelidade incondicional aos meus princípios morais invioláveis.", scores: { idealist: 3 } },
+                    { text: "A preservação da minha paz interior e da minha integridade pessoal.", scores: { stoic: 3 } }
+                ]},
+                en: { q: "What should guide critical decision-making?", options: [
+                    { text: "Logical computation of cold facts and measurable metrics.", scores: { rationalist: 3, empiricist: 2 } },
+                    { text: "Maximizing practical utility and minimizing systemic harm.", scores: { pragmatist: 3 } },
+                    { text: "Unconditional fidelity to inviolable internal moral principles.", scores: { idealist: 3 } },
+                    { text: "Preserving inner peace and personal integrity above all.", scores: { stoic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Qual a postura correta diante do sofrimento inevitável?", options: [
+                    { text: "Suportá-lo sem lamentação e sem permitir que ele estrague o seu julgamento.", scores: { stoic: 3 } },
+                    { text: "Transformar a dor em combustível para a criação artística ou superação.", scores: { existentialist: 3 } },
+                    { text: "Investigar as causas físicas do problema para eliminá-lo na próxima vez.", scores: { pragmatist: 3, empiricist: 1 } },
+                    { text: "Rir do absurdo da condição humana e se recusar a fazer drama.", scores: { cynic: 3 } }
+                ]},
+                en: { q: "What is the proper stance facing inevitable suffering?", options: [
+                    { text: "Enduring without complaint, keeping judgment unclouded.", scores: { stoic: 3 } },
+                    { text: "Transmuting pain into raw fuel for artistic creation or self-overcoming.", scores: { existentialist: 3 } },
+                    { text: "Investigating physical causes to eradicate recurrence.", scores: { pragmatist: 3, empiricist: 1 } },
+                    { text: "Laughing at human absurdity and refusing theatrical grief.", scores: { cynic: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Como você avalia a busca humana por reconhecimento e fama?", options: [
+                    { text: "Uma vaidade vazia; palmas são apenas barulho de mãos que logo estarão no túmulo.", scores: { stoic: 3, cynic: 3 } },
+                    { text: "Útil se funcionar como alavanca de influência; irrelevante como validação.", scores: { pragmatist: 3 } },
+                    { text: "Superficial; a única aprovação que importa é a da própria razão interna.", scores: { rationalist: 2, idealist: 2 } },
+                    { text: "Uma fuga da angústia de ter que encarar quem você realmente é a sós.", scores: { existentialist: 3 } }
+                ]},
+                en: { q: "How do you evaluate the pursuit of fame and recognition?", options: [
+                    { text: "Empty vanity; applause is mere noise from hands soon bound for graves.", scores: { stoic: 3, cynic: 3 } },
+                    { text: "Useful if leveraging influence; irrelevant as personal validation.", scores: { pragmatist: 3 } },
+                    { text: "Superficial; the only meaningful approval is internal reason.", scores: { rationalist: 2, idealist: 2 } },
+                    { text: "An escape from the angst of facing yourself alone.", scores: { existentialist: 3 } }
+                ]}
+            },
+            {
+                pt: { q: "Ao final de tudo, qual é a postura suprema de uma mente lúcida?", options: [
+                    { text: "Ser a força de ordem (o dique) que opera com clareza mesmo cercado pelo caos.", scores: { pragmatist: 3, stoic: 2 } },
+                    { text: "Exercer a dúvida sistemática e nunca se curvar a dogmas ou autoridades.", scores: { rationalist: 2, cynic: 3 } },
+                    { text: "Forjar o próprio caminho com absoluta autenticidade, sem pedir permissão.", scores: { existentialist: 3 } },
+                    { text: "Alcançar a virtude da apatheia: imperturbável diante da vida e da morte.", scores: { stoic: 3 } }
+                ]},
+                en: { q: "In the end, what is the supreme posture of a lucid mind?", options: [
+                    { text: "Being the stabilizing force operating with clarity amidst chaos.", scores: { pragmatist: 3, stoic: 2 } },
+                    { text: "Exercising systematic doubt and never bowing to dogma or authority.", scores: { rationalist: 2, cynic: 3 } },
+                    { text: "Forging your path with absolute authenticity without requesting permission.", scores: { existentialist: 3 } },
+                    { text: "Attaining apatheia: imperturbable before life and death.", scores: { stoic: 3 } }
+                ]}
+            }
+        ];
+
+        const archetypes = {
+            rationalist: { 
+                pt: { name: "Sócrates / Descartes", role: "O Racionalista Implacável", desc: "Você valoriza o rigor da lógica, a desconstrução de dogmas e o método. Não tolera premissas falsas.", quote: "Uma vida sem busca e sem exame não vale a pena ser vivida." },
+                en: { name: "Socrates / Descartes", role: "The Relentless Rationalist", desc: "You value logical rigor, deconstructing dogmas, and systematic method. False premises are unacceptable.", quote: "An unexamined life is not worth living." }
+            },
+            pragmatist: { 
+                pt: { name: "Maquiavel / Francis Bacon", role: "O Engenheiro de Sistemas (Pragmático)", desc: "Você foca na matéria, na eficiência e nos resultados reais. Não perde tempo com abstrações inúteis.", quote: "A sabedoria consiste em saber distinguir a natureza dos inconvenientes e adotar o menos prejudicial." },
+                en: { name: "Machiavelli / Francis Bacon", role: "The Systems Engineer (Pragmatist)", desc: "You focus on matter, efficiency, and tangible outcomes. Useless abstractions are ignored.", quote: "Wisdom consists of knowing how to distinguish the nature of troubles and accepting the least harmful." }
+            },
+            stoic: { 
+                pt: { name: "Marco Aurélio / Sêneca", role: "O Guardião da Inteireza (Estoico)", desc: "Sua força reside na soberania interior, no autocontrole e no dever de manter a ordem pessoal perante o caos.", quote: "Você tem poder sobre sua mente — não sobre eventos externos. Perceba isso e encontrará sua força." },
+                en: { name: "Marcus Aurelius / Seneca", role: "The Guardian of Integrity (Stoic)", desc: "Your strength lies in inner sovereignty, self-control, and maintaining personal order against chaos.", quote: "You have power over your mind — not outside events. Realize this, and you will find strength." }
+            },
+            existentialist: { 
+                pt: { name: "Nietzsche / Sartre", role: "O Criador Soberano (Existencialista)", desc: "Você rejeita fôrmas prontas. Enxerga a vida como uma tela onde é preciso forjar o próprio sentido na marra.", quote: "Aquele que tem um porquê pelo qual viver pode suportar quase qualquer como." },
+                en: { name: "Nietzsche / Sartre", role: "The Sovereign Creator (Existentialist)", desc: "You reject pre-packaged molds. Life is a blank canvas where meaning must be forged by will.", quote: "He who has a why to live can bear almost any how." }
+            },
+            cynic: { 
+                pt: { name: "Diógenes de Sinope", role: "O Cético Destruidor de Ilusões (Cínico)", desc: "Você enxerga através da hipocrisia social e rói qualquer verniz de vaidade. Seu foco é a verdade crua.", quote: "Estou procurando um homem honesto — e desmascarando os farsantes no caminho." },
+                en: { name: "Diogenes of Sinope", role: "The Illusion Destroyer (Cynic)", desc: "You pierce through social hypocrisy and strip away vanity. Your focus is unvarnished truth.", quote: "I am looking for an honest man — unmasking pretenders along the way." }
+            },
+            idealist: { 
+                pt: { name: "Platão / Kant", role: "O Arquétipo Idealista", desc: "Você busca formas perfeitas, deveres categóricos e uma ordem moral intrínseca acima do mundo físico.", quote: "O mundo real é aquele que se pensa, não aquele que se vê." },
+                en: { name: "Plato / Kant", role: "The Idealist Archetype", desc: "You seek perfect forms, categorical duties, and intrinsic moral order above the material world.", quote: "The real world is that which is thought, not that which is seen." }
+            },
+            empiricist: { 
+                pt: { name: "John Locke / David Hume", role: "O Observador Empirista", desc: "Você só aceita o que pode ser medido, testado e verificado na prática do mundo físico.", quote: "Nenhum conhecimento humano pode ir além da sua experiência." },
+                en: { name: "John Locke / David Hume", role: "The Empirical Observer", desc: "You only accept what can be measured, tested, and empirically verified in physical reality.", quote: "No human knowledge can go beyond experience." }
+            }
+        };
+
+        let currentQ = 0;
+        let scores = { rationalist: 0, pragmatist: 0, stoic: 0, existentialist: 0, cynic: 0, idealist: 0, empiricist: 0 };
+
+        function updateStaticText() {
+            const t = uiText[currentLang];
+            document.getElementById('txt-title').innerText = t.title;
+            document.getElementById('txt-desc').innerText = t.desc;
+            document.getElementById('btn-start').innerText = t.startBtn;
+            document.getElementById('lbl-result-header').innerText = t.resHeader;
+            document.getElementById('lbl-result-title').innerText = t.resTitle;
+            document.getElementById('lbl-ally').innerText = t.ally;
+            document.getElementById('lbl-rival').innerText = t.rival;
+            document.getElementById('lbl-accuser').innerText = t.accuser;
+            document.getElementById('lbl-enemy').innerText = t.enemy;
+            document.getElementById('btn-copy').innerText = t.copyBtn;
+            document.getElementById('btn-reset').innerText = t.resetBtn;
+            document.getElementById('btn-lang').innerText = currentLang === 'pt' ? 'EN' : 'PT';
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'pt' ? 'en' : 'pt';
+            updateStaticText();
+            if (!document.getElementById('screen-quiz').classList.contains('hidden')) {
+                renderQuestion();
+            } else if (!document.getElementById('screen-result').classList.contains('hidden')) {
+                showResults();
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('screen-intro').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qObj = questionsData[currentQ][currentLang];
+            const t = uiText[currentLang];
+            
+            document.getElementById('question-number').innerText = `${t.qPrefix} ${currentQ + 1} ${t.qOf} ${questionsData.length}`;
+            const pct = Math.round(((currentQ + 1) / questionsData.length) * 100);
+            document.getElementById('progress-percent').innerText = `${pct}%`;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('question-text').innerText = qObj.q;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            qObj.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl glass-card text-gray-200 text-sm md:text-base font-medium flex items-center justify-start space-x-3 cursor-pointer";
+                btn.onclick = () => selectOption(opt.scores);
+                btn.innerHTML = `<span class="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs text-red-500 font-bold shrink-0">${String.fromCharCode(65 + idx)}</span><span>${opt.text}</span>`;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(optScores) {
+            for (let key in optScores) {
+                if (scores[key] !== undefined) {
+                    scores[key] += optScores[key];
+                }
+            }
+
+            currentQ++;
+            if (currentQ < questionsData.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            const sorted = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
+            const t = uiText[currentLang];
+
+            const allyKey = sorted[0];
+            const rivalKey = sorted[1];
+            const accuserKey = sorted[sorted.length - 2];
+            const enemyKey = sorted[sorted.length - 1];
+
+            const ally = archetypes[allyKey][currentLang];
+            const rival = archetypes[rivalKey][currentLang];
+            const accuser = archetypes[accuserKey][currentLang];
+            const enemy = archetypes[enemyKey][currentLang];
+
+            document.getElementById('res-ally-name').innerText = `${ally.name}`;
+            document.getElementById('res-ally-desc').innerText = `${ally.role}: ${ally.desc}`;
+
+            document.getElementById('res-rival-name').innerText = `${rival.name}`;
+            document.getElementById('res-rival-desc').innerText = `${rival.role}: ${t.rivalDescSuffix}`;
+
+            document.getElementById('res-accuser-name').innerText = `${accuser.name}`;
+            document.getElementById('res-accuser-desc').innerText = `${accuser.role}: ${t.accuserDescSuffix}`;
+
+            document.getElementById('res-enemy-name').innerText = `${enemy.name}`;
+            document.getElementById('res-enemy-desc').innerText = `${enemy.role}: ${t.enemyDescSuffix}`;
+
+            document.getElementById('res-quote').innerText = `"${ally.quote}" — ${ally.name.split('/')[0]}`;
+        }
+
+        function resetQuiz() {
+            currentQ = 0;
+            scores = { rationalist: 0, pragmatist: 0, stoic: 0, existentialist: 0, cynic: 0, idealist: 0, empiricist: 0 };
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-intro').classList.remove('hidden');
+        }
+
+        function copyResult() {
+            const ally = document.getElementById('res-ally-name').innerText;
+            const enemy = document.getElementById('res-enemy-name').innerText;
+            const t = uiText[currentLang];
+            const text = `${t.resHeader} - O Oráculo dos Filósofos:\n- ${t.ally}: ${ally}\n- ${t.enemy}: ${enemy}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert(t.copiedAlert);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-lang').addEventListener('click', toggleLanguage);
+            document.getElementById('btn-start').addEventListener('click', startQuiz);
+            document.getElementById('btn-copy').addEventListener('click', copyResult);
+            document.getElementById('btn-reset').addEventListener('click', resetQuiz);
+            updateStaticText();
+        });
+    </script>
+</body>
+</html>
